@@ -35,7 +35,7 @@ interface AnalyzedItem {
 /**
  * 메인 대시보드 페이지 컴포넌트입니다.
  * 사용자의 일일 섭취 및 운동량을 기록하고, AI 분석 기능을 통한 데이터 시각화를 제공합니다.
- * 
+ *
  * @author 윤명준 (MJ Yune)
  * @since 2026-01-28
  */
@@ -65,9 +65,12 @@ export const DashboardPage: React.FC = () => {
     const bulkInputRef = React.useRef<HTMLTextAreaElement>(null);
 
     // Derived state to check if we have any input
-    const hasAnyInput = inputMode === 'BULK' ? inputs.bulk.trim() !== '' : Object.entries(inputs).some(([k, v]) => {
-        return k !== 'bulk' && v.trim() !== '';
-    });
+    const hasAnyInput =
+        inputMode === 'BULK'
+            ? inputs.bulk.trim() !== ''
+            : Object.entries(inputs).some(([k, v]) => {
+                  return k !== 'bulk' && v.trim() !== '';
+              });
 
     // Use a simple boolean to control visibility if needed, but viewMode 'LOG' is primary.
     const inputsViewMode = viewMode === 'LOG';
@@ -102,7 +105,7 @@ export const DashboardPage: React.FC = () => {
                 const errData = await res.json().catch(() => ({}));
                 console.error('[Dashboard] Failed to fetch logs:', res.status, res.statusText, errData);
                 // 사용자에게 시각적 피드백 제공 (선택적)
-                // alert('데이터를 불러오는 중 오류가 발생했습니다. 콘솔을 확인해주세요.'); 
+                // alert('데이터를 불러오는 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
                 throw new Error(`Logs fetch failed: ${res.status}`);
             }
             const data = await res.json();
@@ -349,11 +352,7 @@ export const DashboardPage: React.FC = () => {
                             }}
                             className="p-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition relative z-50 cursor-pointer"
                         >
-                            {theme === 'dark' ? (
-                                <Sun className="w-5 h-5" />
-                            ) : (
-                                <Moon className="w-5 h-5" />
-                            )}
+                            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                         </button>
                         <button
                             onClick={logout}
@@ -430,7 +429,10 @@ export const DashboardPage: React.FC = () => {
                             {user?.role === 'ADMIN' && (
                                 <button
                                     onClick={() => setViewMode('ADMIN')}
-                                    className={cn('p-1.5 transition-all flex items-center gap-2 px-3', viewMode === 'ADMIN' ? 'bg-white dark:bg-slate-800 shadow text-red-500 font-medium border border-gray-200 dark:border-slate-700' : 'text-gray-400 hover:text-gray-600 dark:hover:text-slate-300')}
+                                    className={cn(
+                                        'p-1.5 transition-all flex items-center gap-2 px-3',
+                                        viewMode === 'ADMIN' ? 'bg-white dark:bg-slate-800 shadow text-red-500 font-medium border border-gray-200 dark:border-slate-700' : 'text-gray-400 hover:text-gray-600 dark:hover:text-slate-300',
+                                    )}
                                 >
                                     <ShieldAlert className="w-4 h-4" /> 관리자
                                 </button>
@@ -713,7 +715,10 @@ export const DashboardPage: React.FC = () => {
                                 ))}
                             </div>
                         </div>
-                        <StatsChart data={statsData} isDarkMode={theme === 'dark'} />
+                        <StatsChart
+                            data={statsData}
+                            isDarkMode={theme === 'dark'}
+                        />
 
                         <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 text-sm text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
                             <p>💡 팁: 꾸준히 기록할수록 AI가 사용자의 패턴을 더 잘 이해할 수 있습니다.</p>
@@ -735,7 +740,8 @@ export const DashboardPage: React.FC = () => {
                                     <h3 className="font-bold text-gray-800 dark:text-gray-200 px-1 border-l-4 border-primary pl-3 flex items-center justify-between text-sm">
                                         {category}
                                         <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-900 px-2 py-0.5 border border-gray-200 dark:border-slate-800">
-                                            {categoryTotal > 0 ? '+' : ''}{categoryTotal} kcal
+                                            {categoryTotal > 0 ? '+' : ''}
+                                            {categoryTotal} kcal
                                         </span>
                                     </h3>
 

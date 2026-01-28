@@ -26,7 +26,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages # Cloudflare Pages로 배포 실행 (npx wrangler 직접 사용)
-        run: npx wrangler pages deploy dist --project-name=daily-calorie-log
+        run: npx wrangler pages deploy --project-name=daily-calorie-log
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }} # 저장된 보안 토큰 사용
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # 저장된 계정 ID 사용
