@@ -1,32 +1,32 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Pages # 워크플로우 이름
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main # main 브랜치에 코드가 푸시될 때 실행
+  workflow_dispatch: # GitHub Actions UI에서 수동으로 실행 가능하게 설정
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 최신 우분투 환경에서 실행
     steps:
-      - name: Checkout
+      - name: Checkout # 소스 코드 가져오기
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js # Node.js 환경 설정 (v22 사용)
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies # 의존성 라이브러리 설치
         run: npm ci
 
-      - name: Build
+      - name: Build # 프로젝트 빌드 (dist 폴더 생성)
         run: npm run build
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages # Cloudflare Pages로 배포 실행 (npx wrangler 직접 사용)
         run: npx wrangler pages deploy dist --project-name=daily-calorie-log
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }} # 저장된 보안 토큰 사용
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # 저장된 계정 ID 사용
