@@ -8,4 +8,3 @@ compatibility_date = "2024-11-01"
 binding = "DB"
 database_name = "daily-calorie-db"
 database_id = "764b12ff-b731-4366-b46b-1da615b5e78b"
-preview_database_id = "DB" # For local dev

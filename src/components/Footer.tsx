@@ -21,7 +21,7 @@ export const Footer: React.FC = () => {
                     {/* Social Links Section */}
                     <div className="flex items-center space-x-6">
                         <a
-                            href="https://github.com/mj-youn"
+                            href="https://github.com/MJ-Youn/daily-calorie-db"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
