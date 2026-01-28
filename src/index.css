@@ -1,14 +1,41 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--color-blue-600);
+  --color-secondary: var(--color-purple-600);
+  
+  --color-food: var(--color-orange-500);
+  --color-exercise: var(--color-purple-500);
+}
+
+/* Force dark mode class strategy for Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+/* Hide native date picker icon since we use a custom button */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #f3f4f6; /* Light gray background */
-  color: #1f2937;
+  @apply antialiased transition-colors duration-300;
+}
+
+.dark body {
+  background-color: theme('colors.slate.950');
+  color: theme('colors.slate.200');
 }

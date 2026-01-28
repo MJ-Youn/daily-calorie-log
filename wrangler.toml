@@ -1,0 +1,11 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "daily-calorie-log"
+compatibility_date = "2024-09-23"
+# pages_build_output_dir = "dist"
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "daily-calorie-db"
+database_id = "764b12ff-b731-4366-b46b-1da615b5e78b"
+preview_database_id = "DB" # For local dev
