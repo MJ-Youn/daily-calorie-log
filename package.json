@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "wrangler pages dev --port 8788 -- npm run dev"
+    "start": "wrangler pages dev --port 8788 -- npm run dev",
+    "deploy": "sed -i '' 's/^# pages_build_output_dir/pages_build_output_dir/' wrangler.toml && npm run build && npx wrangler pages deploy; sed -i '' 's/^pages_build_output_dir/# pages_build_output_dir/' wrangler.toml",
+    "db:pull": "rm -rf .wrangler/state/v3/d1 && wrangler d1 export daily-calorie-db --remote --output ./prod-snapshot.sql && wrangler d1 execute daily-calorie-db --local --file ./prod-snapshot.sql"
   },
   "dependencies": {
     "clsx": "^2.1.1",

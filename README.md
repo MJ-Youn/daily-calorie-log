@@ -64,24 +64,42 @@ EOF
 npx wrangler d1 migrations apply daily-calorie-db --local
 
 # 개발 서버 실행 (Cloudflare Pages Functions 포함)
+# 개발 서버 실행 (Cloudflare Pages Functions 포함)
 npm run start
+```
+
+#### 🔄 원격 데이터베이스 가져오기 (DB Sync)
+원격 환경(운영 서버)의 실제 데이터로 로컬 테스트를 하고 싶을 때 사용합니다.
+> **주의**: 로컬 데이터베이스가 초기화(삭제 후 재생성)됩니다.
+
+```bash
+npm run db:pull
 ```
 
 ---
 
 ## 📦 빌드 및 배포 (Build & Deployment)
 
-### 1. 원격 데이터베이스 설정 (최초 1회)
-```bash
-# Cloudflare에 D1 데이터베이스 생성
-npx wrangler d1 create daily-calorie-db
+> **알림**: 현재 자동 배포(GitHub Actions) 대신 **수동 배포**를 권장합니다.
 
-# 원격 DB에 마이그레이션 적용
+### 1. 배포 실행 (자동화)
+번거로운 설정 변경 없이 아래 명령어 하나로 **빌드 + 설정 적용 + 배포 + 원복**이 한 번에 처리됩니다.
+```bash
+npm run deploy
+```
+*(배포 도중 `wrangler.toml`이 잠시 수정되지만, 완료 후 자동으로 원래대로 돌아옵니다.)*
+
+---
+
+### [참고] 초기 설정 (Initial Setup)
+
+#### 1. 원격 데이터베이스 생성 (최초 1회)
+```bash
+npx wrangler d1 create daily-calorie-db
 npx wrangler d1 migrations apply daily-calorie-db --remote
 ```
 
-### 2. 비밀키(Secrets) 등록
-배포 환경에서는 `.dev.vars` 대신 Wrangler를 통해 비밀키를 등록해야 합니다.
+#### 2. 비밀키(Secrets) 등록
 ```bash
 npx wrangler pages secret put GOOGLE_CLIENT_ID --project-name daily-calorie-log
 npx wrangler pages secret put GOOGLE_CLIENT_SECRET --project-name daily-calorie-log
@@ -89,13 +107,6 @@ npx wrangler pages secret put GOOGLE_REDIRECT_URI --project-name daily-calorie-l
 npx wrangler pages secret put JWT_SECRET --project-name daily-calorie-log
 npx wrangler pages secret put GEMINI_API_KEY --project-name daily-calorie-log
 ```
-
-### 3. 배포 실행
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name daily-calorie-log
-```
-
 ---
 
 ## 📝 프로젝트 정보 및 면책 조항
@@ -106,5 +117,9 @@ npx wrangler pages deploy dist --project-name daily-calorie-log
 ---
 
 ### 📅 마스터 릴리즈 노트
+- **v1.1 (2026-01-29)**: 로컬 개발 환경 개선 및 안정화
+  - **Feature**: `npm run db:pull` 명령어 추가 (원격 데이터 로컬 동기화).
+  - **Fix**: 프로덕션 환경 인증(쿠키 처리) 신뢰성 개선.
+  - **Chore**: GitHub Actions 배포 워크플로우 안정화 및 날짜 표시 버그 수정.
 - **v1.0 (2026-01-28)**: 초기 릴리즈. AI 분석, 관리자 대시보드, 통계 기능 포함.
 
