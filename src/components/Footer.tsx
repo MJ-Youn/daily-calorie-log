@@ -1,5 +1,5 @@
-import React from 'react';
 import { Github, Globe, Mail } from 'lucide-react';
+import { APP_VERSION } from '../constants';
 
 /**
  * 어플리케이션 하단에 위치하는 푸터 컴포넌트입니다.
@@ -8,14 +8,16 @@ import { Github, Globe, Mail } from 'lucide-react';
  * @author 윤명준 (MJ Yune)
  * @since 2026-01-28
  */
-export const Footer: React.FC = () => {
+export const Footer = () => {
     return (
-        <footer className="fixed bottom-0 left-0 right-0 w-full py-4 border-t border-gray-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md z-40 transition-colors duration-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <footer className="fixed bottom-0 left-0 right-0 w-full py-4 border-t border-gray-200 dark:border-slate-800 bg-white/60 dark:bg-slate-950/60 backdrop-blur-md z-40 transition-colors duration-300">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     {/* Copyright Section */}
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                        © 2026 <span className="font-bold text-gray-900 dark:text-white">윤명준 (MJ Yun)</span>. All rights reserved.
+                    <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <span>© 2026 <span className="font-bold text-gray-900 dark:text-white">윤명준 (MJ Yun)</span>. All rights reserved.</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        <span className="text-gray-400 dark:text-gray-500 font-mono text-xs">{APP_VERSION}</span>
                     </div>
 
                     {/* Social Links Section */}

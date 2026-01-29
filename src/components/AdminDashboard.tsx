@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
 import { Card } from './ui';
 import { Users, FileText, Activity, ExternalLink, Search as SearchIcon } from 'lucide-react';
+import { APP_VERSION } from '../constants';
 
 interface AdminStats {
     totalUsers: number;
@@ -14,7 +15,7 @@ interface AdminStats {
 /**
  * 관리자 전용 대시보드 컴포넌트입니다.
  * 전체 사용자 통계와 최근 활동 로그를 관리하며 검색 및 페이징 기능을 제공합니다.
- * 
+ *
  * @author 윤명준 (MJ Yune)
  * @since 2026-01-28
  */
@@ -45,7 +46,7 @@ export const AdminDashboard: React.FC = () => {
 
     useEffect(() => {
         let isMounted = true;
-        
+
         const query = new URLSearchParams({
             page: page.toString(),
             limit: limit.toString(),
@@ -86,7 +87,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={cn('space-y-4 animate-in fade-in duration-300 transition-opacity', loading ? 'opacity-60 pointer-events-none' : 'opacity-100')}>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white border-b dark:border-gray-800 pb-2 flex items-center justify-between">
                 Admin Dashboard
-                <span className="text-[10px] font-normal text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">v1.0</span>
+                <span className="text-[10px] font-normal text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">{APP_VERSION}</span>
             </h2>
 
             {/* Overview Cards */}
@@ -242,7 +243,7 @@ export const AdminDashboard: React.FC = () => {
 
 /**
  * 시스템 통합 상태 및 외부 링크를 표시하는 보호된 컴포넌트입니다.
- * 
+ *
  * @author 윤명준 (MJ Yune)
  * @since 2026-01-28
  */
@@ -303,7 +304,7 @@ const SystemStatus: React.FC = () => {
 
 /**
  * 개별 시스템 상태 항목을 렌더링합니다.
- * 
+ *
  * @author 윤명준 (MJ Yune)
  * @since 2026-01-28
  * @param {Object} props - 컴포넌트 속성

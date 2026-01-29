@@ -71,6 +71,8 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
         const query = `
       SELECT 
         recorded_date,
+        SUM(CASE WHEN type = 'FOOD' THEN calories ELSE 0 END) as total_intake,
+        SUM(CASE WHEN type != 'FOOD' THEN ABS(calories) ELSE 0 END) as total_exercise,
         SUM(CASE WHEN type = 'FOOD' THEN calories ELSE -ABS(calories) END) as net_calories,
         SUM(protein) as total_protein
       FROM activity_logs 

@@ -5,6 +5,7 @@ import { cn } from '../lib/utils';
 import { Card, Button } from '../components/ui';
 import { StatsChart } from '../components/StatsChart';
 import { AdminDashboard } from '../components/AdminDashboard';
+import { StatsTable } from '../components/StatsTable';
 import { Send, Utensils, Activity, LogOut, CheckCircle, BarChart3, List, ShieldAlert, Sun, Moon, Trash2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Log {
@@ -20,6 +21,8 @@ interface Log {
 
 interface StatData {
     recorded_date: string;
+    total_intake: number;
+    total_exercise: number;
     net_calories: number;
     total_protein: number;
 }
@@ -60,7 +63,7 @@ export const DashboardPage: React.FC = () => {
     const [logs, setLogs] = useState<Log[]>([]);
     const [statsData, setStatsData] = useState<StatData[]>([]);
     const [viewMode, setViewMode] = useState<'LOG' | 'STATS' | 'ADMIN'>('LOG');
-    const [statsRange, setStatsRange] = useState<'7' | '30' | 'ALL'>('ALL');
+    const [statsRange, setStatsRange] = useState<'7' | '30' | 'ALL'>('7');
     const [selectedDate, setSelectedDate] = useState(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date()));
     const bulkInputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -327,7 +330,7 @@ export const DashboardPage: React.FC = () => {
     return (
         <div className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
             {/* Header */}
-            <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300">
+            <header className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-b dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300">
                 <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         {user?.picture ? (
@@ -366,43 +369,8 @@ export const DashboardPage: React.FC = () => {
             </header>
 
             <main className="max-w-3xl mx-auto px-3 py-3 space-y-3">
-                {/* Date & View Toggle Header */}
+                {/* View Toggle Header */}
                 <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-1">
-                        <button
-                            onClick={handlePrevDate}
-                            className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-                            title="이전 날짜"
-                        >
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <h2 className="text-xl font-extrabold dark:text-white flex items-center gap-2">
-                            {new Date(selectedDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
-
-                            <button
-                                onClick={() => (document.querySelector('input[type="date"]') as HTMLInputElement)?.showPicker()}
-                                className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-primary transition-colors relative"
-                                title="날짜 선택"
-                            >
-                                <Calendar className="w-5 h-5" />
-                                <input
-                                    type="date"
-                                    value={selectedDate}
-                                    onChange={(e) => setSelectedDate(e.target.value)}
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                />
-                            </button>
-                        </h2>
-                        <button
-                            onClick={handleNextDate}
-                            disabled={selectedDate >= new Date().toISOString().split('T')[0]}
-                            className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                            title="다음 날짜"
-                        >
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
-                    </div>
-
                     <div className="flex justify-between items-center">
                         <div className="flex bg-gray-100 dark:bg-slate-900 p-1 border border-gray-200 dark:border-slate-800">
                             <button
@@ -439,28 +407,74 @@ export const DashboardPage: React.FC = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* Date Selector - Only visible in LOG mode */}
+                    {viewMode === 'LOG' && (
+                        <div className="flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <button
+                                onClick={handlePrevDate}
+                                className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                title="이전 날짜"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <h2 className="text-xl font-extrabold dark:text-white flex items-center gap-2">
+                                {new Date(selectedDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
+
+                                <button
+                                    onClick={() => (document.querySelector('input[type="date"]') as HTMLInputElement)?.showPicker()}
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-primary transition-colors relative"
+                                    title="날짜 선택"
+                                >
+                                    <Calendar className="w-5 h-5" />
+                                    <input
+                                        type="date"
+                                        value={selectedDate}
+                                        onChange={(e) => setSelectedDate(e.target.value)}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    />
+                                </button>
+                            </h2>
+                            <button
+                                onClick={handleNextDate}
+                                disabled={selectedDate >= new Date().toISOString().split('T')[0]}
+                                className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                                title="다음 날짜"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Daily Summary Compact Grid */}
-                {/* Daily Summary Compact Grid */}
-                <div className="grid grid-cols-4 gap-2">
-                    <Card className="bg-white dark:bg-slate-900/50 border-none shadow-none p-2 flex flex-col items-center justify-center text-center ring-1 ring-gray-100 dark:ring-slate-800">
-                        <span className="text-[10px] text-gray-500 dark:text-slate-400 font-medium mb-1">섭취</span>
-                        <span className="text-base font-bold text-gray-900 dark:text-white">{Math.round(totalFoodCalories)}</span>
-                    </Card>
-                    <Card className="bg-white dark:bg-slate-900/50 border-none shadow-none p-2 flex flex-col items-center justify-center text-center ring-1 ring-gray-100 dark:ring-slate-800">
-                        <span className="text-[10px] text-gray-500 dark:text-slate-400 font-medium mb-1">운동</span>
-                        <span className="text-base font-bold text-gray-900 dark:text-white">-{Math.round(totalExerciseCalories)}</span>
-                    </Card>
-                    <Card className="col-span-1 bg-blue-600 dark:bg-blue-500/10 text-white dark:text-blue-400 border-none dark:border dark:border-blue-500/20 shadow-none p-2 flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] text-blue-100 dark:text-blue-400/70 font-medium mb-1">순칼로리</span>
-                        <span className="text-base font-bold">{Math.round(totalNetCalories)}</span>
-                    </Card>
-                    <Card className="bg-emerald-600 dark:bg-emerald-500/10 text-white dark:text-emerald-400 border-none dark:border dark:border-emerald-500/20 shadow-none p-2 flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] text-emerald-100 dark:text-emerald-400/70 font-medium mb-1">단백질</span>
-                        <span className="text-base font-bold">{Math.round(totalProtein)}g</span>
-                    </Card>
-                </div>
+                {/* Daily Summary Compact Grid - Only visible in LOG mode */}
+                {viewMode === 'LOG' && (
+                    <div className="grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Card className="bg-white dark:bg-slate-900/50 border-none shadow-none p-2 flex flex-col items-center justify-center text-center ring-1 ring-gray-100 dark:ring-slate-800">
+                            <span className="text-[10px] text-gray-500 dark:text-slate-400 font-medium mb-1">섭취</span>
+                            <span className="text-base font-bold text-gray-900 dark:text-white">
+                                {Math.round(totalFoodCalories)} <span className="text-xs font-normal text-gray-500">kcal</span>
+                            </span>
+                        </Card>
+                        <Card className="bg-white dark:bg-slate-900/50 border-none shadow-none p-2 flex flex-col items-center justify-center text-center ring-1 ring-gray-100 dark:ring-slate-800">
+                            <span className="text-[10px] text-gray-500 dark:text-slate-400 font-medium mb-1">운동</span>
+                            <span className="text-base font-bold text-gray-900 dark:text-white">
+                                -{Math.round(totalExerciseCalories)} <span className="text-xs font-normal text-gray-500">kcal</span>
+                            </span>
+                        </Card>
+                        <Card className="col-span-1 bg-blue-600 dark:bg-blue-500/10 text-white dark:text-blue-400 border-none dark:border dark:border-blue-500/20 shadow-none p-2 flex flex-col items-center justify-center text-center">
+                            <span className="text-[10px] text-blue-100 dark:text-blue-400/70 font-medium mb-1">순칼로리</span>
+                            <span className="text-base font-bold">
+                                {Math.round(totalNetCalories)} <span className="text-xs font-normal opacity-70">kcal</span>
+                            </span>
+                        </Card>
+                        <Card className="bg-emerald-600 dark:bg-emerald-500/10 text-white dark:text-emerald-400 border-none dark:border dark:border-emerald-500/20 shadow-none p-2 flex flex-col items-center justify-center text-center">
+                            <span className="text-[10px] text-emerald-100 dark:text-emerald-400/70 font-medium mb-1">단백질</span>
+                            <span className="text-base font-bold">{Math.round(totalProtein)}g</span>
+                        </Card>
+                    </div>
+                )}
 
                 {viewMode !== 'ADMIN' && inputsViewMode && (
                     <div className="space-y-6">
@@ -719,9 +733,12 @@ export const DashboardPage: React.FC = () => {
                             data={statsData}
                             isDarkMode={theme === 'dark'}
                         />
+                        <div className="mt-4">
+                            <StatsTable data={statsData} />
+                        </div>
 
                         <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 text-sm text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
-                            <p>💡 팁: 꾸준히 기록할수록 AI가 사용자의 패턴을 더 잘 이해할 수 있습니다.</p>
+                            <p>💡 팁: 음식의 양(g, 개수)을 구체적으로 적을수록 AI가 더 정확하게 분석합니다.</p>
                         </div>
                     </div>
                 ) : (

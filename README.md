@@ -117,6 +117,11 @@ npx wrangler pages secret put GEMINI_API_KEY --project-name daily-calorie-log
 ---
 
 ### 📅 마스터 릴리즈 노트
+- **v1.2 (2026-01-29)**: UI/UX 전면 개편 및 안정화 (Current)
+  - **UX/UI**: 메뉴 상단 배치, 화면별 요소(날짜 선택기 등) 조건부 표시로 몰입감 향상.
+  - **Feature**: 통계 차트 상세 데이터 테이블 추가 및 시각적 필터(체크박스) 구현.
+  - **Refactor**: 버전 정보(`v1.2.20260129`) 중앙 관리 및 Footer/Admin 표시 추가.
+  - **Chore**: 프로덕션 로그 최적화 및 코드 클린업 완료.
 - **v1.1 (2026-01-29)**: 로컬 개발 환경 개선 및 안정화
   - **Feature**: `npm run db:pull` 명령어 추가 (원격 데이터 로컬 동기화).
   - **Fix**: 프로덕션 환경 인증(쿠키 처리) 신뢰성 개선.
