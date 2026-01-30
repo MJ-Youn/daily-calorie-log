@@ -21,6 +21,7 @@ export const onRequest = async (context: { request: Request; next: () => Promise
     if (
         url.pathname === '/verify' ||
         url.pathname.startsWith('/api/verify-turnstile') ||
+        url.pathname.startsWith('/api/auth/') || // 로그인/회원가입 등은 검증 전에도 호출 가능해야 함
         url.pathname.startsWith('/assets/') ||
         url.pathname.startsWith('/src/') || // Dev mode assets
         url.pathname.startsWith('/node_modules/') || // Dev mode assets
@@ -33,6 +34,20 @@ export const onRequest = async (context: { request: Request; next: () => Promise
     // 쿠키 확인
     const cookies = request.headers.get('Cookie') || '';
     if (!cookies.includes('human_verified=true')) {
+        // API 요청인 경우 JSON 에러 반환 (리다이렉트 방지)
+        if (url.pathname.startsWith('/api/')) {
+            return new Response(
+                JSON.stringify({
+                    error: 'Human verification required',
+                    verificationUrl: '/verify',
+                }),
+                {
+                    status: 403,
+                    headers: { 'Content-Type': 'application/json' },
+                }
+            );
+        }
+
         // 인증되지 않음 -> /verify로 리다이렉트
         // 원래 가려던 페이지 정보를 쿼리 파라미터로 전달
         // 단, 이미 /verify로 가는 중이면 무한 루프 방지 (위에서 체크함)
