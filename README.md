@@ -117,7 +117,11 @@ npx wrangler pages secret put GEMINI_API_KEY --project-name daily-calorie-log
 ---
 
 ### 📅 마스터 릴리즈 노트
-- **v1.4 (2026-01-30)**: 보안 강화 및 사용성 개선 (Current)
+- **v1.4.1 (2026-02-01)**: 인증 및 API 안정성 강화 (Current)
+  - **Refactor**: 모든 API 호출(`Fetch`)에 대한 중앙 집중식 인증 핸들러(`protectedFetch`) 구현.
+  - **UX**: 인증 필요한 요청 발생 시, 사용자 확인 절차 없이 즉시 검증 페이지로 리다이렉트(`Auto-Redirect`).
+  - **Cleanup**: 로직 최적화 및 미사용 코드(Dead Code) 제거로 소스 코드 경량화.
+- **v1.4 (2026-01-30)**: 보안 강화 및 사용성 개선
   - **Security**: Cloudflare Turnstile 도입으로 봇 접근 차단 및 무분별한 API 호출 방지.
   - **Feature**: 입력창 단축키(`Ctrl+Enter`) 지원으로 빠른 기록 가능.
   - **UI**: 

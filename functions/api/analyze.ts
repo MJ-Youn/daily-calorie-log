@@ -67,7 +67,6 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
         const data: { candidates?: { content: { parts: { text: string }[] } }[]; error?: { message: string } } = await response.json();
 
         if (!response.ok) {
-            // console.error('Gemini API Error:', JSON.stringify(data));
             throw new Error(data.error?.message || 'Gemini API request failed');
         }
 

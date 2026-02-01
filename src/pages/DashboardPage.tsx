@@ -127,8 +127,6 @@ export const DashboardPage: React.FC = () => {
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
                 console.error('[Dashboard] Failed to fetch logs:', res.status, res.statusText, errData);
-                // 사용자에게 시각적 피드백 제공 (선택적)
-                // alert('데이터를 불러오는 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
                 throw new Error(`Logs fetch failed: ${res.status}`);
             }
             const data = await res.json();
@@ -281,7 +279,7 @@ export const DashboardPage: React.FC = () => {
             }
         } catch (error) {
             if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
-               // 저장 실패 시 처리
+                console.error('[Dashboard] Save failed:', error);
             }
         } finally {
             setIsSaving(false);
@@ -305,7 +303,7 @@ export const DashboardPage: React.FC = () => {
             }
         } catch (error) {
              if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
-                // 삭제 중 오류 발생 시 아무것도 하지 않음
+                 console.error('[Dashboard] Delete failed:', error);
              }
         }
     };
