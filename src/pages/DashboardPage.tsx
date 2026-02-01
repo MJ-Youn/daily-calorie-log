@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/utils';
@@ -149,6 +150,8 @@ export const DashboardPage: React.FC = () => {
         }
     };
 
+    const navigate = useNavigate();
+
     const handleAnalyze = async () => {
         if (!hasAnyInput) return;
 
@@ -179,7 +182,17 @@ export const DashboardPage: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: fullText }),
             });
-            const data = await res.json();
+
+            const data = await res.json().catch(() => ({}));
+
+            // 403 Human Verification Required 처리
+            // 403 Human Verification Required 처리
+            if (res.status === 403 && data.error === 'Human verification required') {
+                const next = encodeURIComponent(window.location.pathname + window.location.search);
+                navigate(`/verify?next=${next}`);
+                return;
+            }
+
             // AI 분석 결과 확인 (개발 단계에서만 사용)
             if (data.error) {
                 throw new Error(data.error);
@@ -531,8 +544,8 @@ export const DashboardPage: React.FC = () => {
                                             e.target.style.height = 'auto';
                                             e.target.style.height = e.target.scrollHeight + 'px';
                                         }}
-                                                    rows={2}
-                                                    onKeyDown={handleTextareaKeyDown}
+                                        rows={2}
+                                        onKeyDown={handleTextareaKeyDown}
                                         ref={bulkInputRef}
                                         placeholder={`아침: 사과 1개, 계란 2개\n점심: 김치찌개\n저녁 운동: 런닝 30분\n...`}
                                         className="w-full min-h-[3.5rem] resize-none border-none focus:ring-0 bg-transparent text-sm placeholder:text-gray-400 dark:text-white dark:placeholder:text-gray-600 overflow-hidden"
@@ -586,7 +599,7 @@ export const DashboardPage: React.FC = () => {
                                                         e.target.style.height = 'auto';
                                                         e.target.style.height = e.target.scrollHeight + 'px';
                                                     }}
-                                                                rows={2}
+                                                    rows={2}
                                                     onKeyDown={handleTextareaKeyDown}
                                                     placeholder={field.placeholder}
                                                     className="w-full min-h-[3rem] p-2 bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 focus:ring-0 focus:border-orange-500 dark:focus:border-orange-500 transition-all resize-none text-sm overflow-hidden border"
