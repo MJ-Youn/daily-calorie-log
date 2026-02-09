@@ -1,6 +1,8 @@
 export const onRequestGet = async (context) => {
-    const client_id = context.env.GOOGLE_CLIENT_ID;
-    const redirect_uri = context.env.GOOGLE_REDIRECT_URI || 'http://localhost:5173/api/auth/callback';
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const client_id = env.GOOGLE_CLIENT_ID;
+    const redirect_uri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/callback`;
 
     // Scopes: info for profile, email
     const scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
