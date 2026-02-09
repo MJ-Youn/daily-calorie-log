@@ -22,7 +22,7 @@ interface StatsProps {
  * @param {StatsProps} props 컴포넌트 속성
  * @returns {JSX.Element} 통계 차트 UI
  */
-export const StatsChart: React.FC<StatsProps> = ({ data, isDarkMode = false }) => {
+export const StatsChart = React.memo(({ data, isDarkMode = false }: StatsProps) => {
     const [visibility, setVisibility] = React.useState({
         net: true,
         intake: true,
@@ -215,4 +215,6 @@ export const StatsChart: React.FC<StatsProps> = ({ data, isDarkMode = false }) =
             </div>
         </Card>
     );
-};
+});
+
+StatsChart.displayName = 'StatsChart';
