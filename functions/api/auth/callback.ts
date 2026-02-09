@@ -20,7 +20,7 @@ export const onRequestGet = async (context: any) => {
 
   const client_id = env.GOOGLE_CLIENT_ID;
   const client_secret = env.GOOGLE_CLIENT_SECRET;
-  const redirect_uri = env.GOOGLE_REDIRECT_URI || "http://localhost:5173/api/auth/callback";
+  const redirect_uri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/callback`;
 
   try {
     // 1. Exchange code for token
