@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { formatDate } from '../lib/dateUtils';
 import { Card } from './ui';
 import { Utensils, Activity, Flame } from 'lucide-react';
@@ -20,8 +20,10 @@ interface StatsTableProps {
  * @since 2026-01-29
  */
 export const StatsTable: React.FC<StatsTableProps> = ({ data }) => {
-    // 날짜 내림차순 정렬 (최신순)
-    const sortedData = [...data].sort((a, b) => new Date(b.recorded_date).getTime() - new Date(a.recorded_date).getTime());
+    // 날짜 내림차순 정렬 (최신순) - useMemo를 사용하여 데이터가 변경될 때만 정렬 수행
+    const sortedData = useMemo(() => {
+        return [...data].sort((a, b) => new Date(b.recorded_date).getTime() - new Date(a.recorded_date).getTime());
+    }, [data]);
 
     return (
         <Card className="overflow-hidden border-none shadow-none bg-white dark:bg-slate-900/50 ring-1 ring-gray-200 dark:ring-slate-800">
