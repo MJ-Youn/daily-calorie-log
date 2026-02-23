@@ -12,6 +12,69 @@ interface Env {
     };
 }
 
+interface LogItem {
+    type: 'FOOD' | 'EXERCISE';
+    content?: string;
+    name?: string;
+    calories: number;
+    protein?: number;
+    category?: string | null;
+}
+
+interface BatchCreateRequest {
+    items: LogItem[];
+    recorded_date: string;
+}
+
+/**
+ * Validates the batch create input.
+ *
+ * @param body Parsed request body
+ * @returns { { error: string } | { data: BatchCreateRequest } } Validation result
+ */
+const validateBatchCreateInput = (body: any): { error: string } | { data: BatchCreateRequest } => {
+    const { items, recorded_date } = body;
+
+    // 1. Validate recorded_date
+    if (!recorded_date || typeof recorded_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(recorded_date)) {
+        return { error: 'Invalid recorded_date format (YYYY-MM-DD required)' };
+    }
+
+    // 2. Validate items array
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        return { error: 'Invalid items: must be a non-empty array' };
+    }
+
+    // 3. Validate each item
+    for (const item of items) {
+        if (!item || typeof item !== 'object') {
+            return { error: 'Invalid item: each item must be an object' };
+        }
+        if (item.type !== 'FOOD' && item.type !== 'EXERCISE') {
+            return { error: 'Invalid item type: must be FOOD or EXERCISE' };
+        }
+
+        const content = item.content || item.name;
+        if (!content || typeof content !== 'string' || content.trim() === '') {
+            return { error: 'Invalid item content: must be a non-empty string' };
+        }
+
+        if (typeof item.calories !== 'number') {
+            return { error: 'Invalid item calories: must be a number' };
+        }
+
+        if (item.protein !== undefined && (typeof item.protein !== 'number' || item.protein < 0)) {
+            return { error: 'Invalid item protein: must be a non-negative number' };
+        }
+
+        if (item.category !== undefined && item.category !== null && typeof item.category !== 'string') {
+            return { error: 'Invalid item category: must be a string' };
+        }
+    }
+
+    return { data: body as BatchCreateRequest };
+};
+
 /**
  * 여러 개의 활동 로그를 한 번에 생성하는 API 엔드포인트입니다.
  * 
@@ -40,66 +103,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
         });
     }
 
-    const { items, recorded_date } = body;
-
     // 3. Validation
-    if (!recorded_date || typeof recorded_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(recorded_date)) {
-        return new Response(JSON.stringify({ error: 'Invalid recorded_date format (YYYY-MM-DD required)' }), {
+    const validationResult = validateBatchCreateInput(body);
+    if ('error' in validationResult) {
+        return new Response(JSON.stringify({ error: validationResult.error }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-        return new Response(JSON.stringify({ error: 'Invalid items: must be a non-empty array' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
-
-    for (const item of items) {
-        if (!item || typeof item !== 'object') {
-            return new Response(JSON.stringify({ error: 'Invalid item: each item must be an object' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        if (item.type !== 'FOOD' && item.type !== 'EXERCISE') {
-            return new Response(JSON.stringify({ error: 'Invalid item type: must be FOOD or EXERCISE' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        const content = item.content || item.name;
-        if (!content || typeof content !== 'string' || content.trim() === '') {
-            return new Response(JSON.stringify({ error: 'Invalid item content: must be a non-empty string' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        if (typeof item.calories !== 'number') {
-            return new Response(JSON.stringify({ error: 'Invalid item calories: must be a number' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        if (item.protein !== undefined && (typeof item.protein !== 'number' || item.protein < 0)) {
-            return new Response(JSON.stringify({ error: 'Invalid item protein: must be a non-negative number' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        if (item.category !== undefined && item.category !== null && typeof item.category !== 'string') {
-            return new Response(JSON.stringify({ error: 'Invalid item category: must be a string' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-    }
+    const { items, recorded_date } = validationResult.data;
 
     try {
         // 4. Prepare Batch Insert
