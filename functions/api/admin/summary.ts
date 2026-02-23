@@ -1,9 +1,4 @@
-import { jwtVerify } from 'jose';
-
-interface Env {
-    JWT_SECRET: string;
-    DB: any;
-}
+import { getSession, Env } from '../auth/me';
 
 /**
  * 관리자 요약 통계 및 로그 정보를 조회하는 API 엔드포인트입니다.
@@ -18,28 +13,12 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
     const { request, env } = context;
 
     // 1. 관리자 권한 확인
-    const cookieHeader = request.headers.get('Cookie');
-    if (!cookieHeader) {
+    const user = await getSession(request, env);
+    if (!user) {
         return new Response('Unauthorized', { status: 401 });
     }
-
-    const cookies = Object.fromEntries(cookieHeader.split('; ').map((c: string) => {
-        return c.split('=');
-    }));
-    const token = cookies['auth_token'];
-    if (!token) {
-        return new Response('Unauthorized', { status: 401 });
-    }
-
-    try {
-        const secret = new TextEncoder().encode(env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-
-        if (payload.role !== 'ADMIN') {
-            return new Response('Forbidden: Admin access required', { status: 403 });
-        }
-    } catch {
-        return new Response('Invalid Token', { status: 401 });
+    if (user.role !== 'ADMIN') {
+        return new Response('Forbidden: Admin access required', { status: 403 });
     }
 
     try {

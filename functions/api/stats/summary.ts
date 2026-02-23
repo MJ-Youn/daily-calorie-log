@@ -1,17 +1,4 @@
-import { jwtVerify } from 'jose';
-
-interface D1Database {
-    prepare: (query: string) => {
-        bind: (...values: (string | number)[]) => {
-            all: () => Promise<{ results: Record<string, unknown>[] }>;
-        };
-    };
-}
-
-interface Env {
-    JWT_SECRET: string;
-    DB: D1Database;
-}
+import { getSession, Env } from '../auth/me';
 
 /**
  * 사용자의 통계 정보를 조회하는 API 엔드포인트입니다.
@@ -28,27 +15,11 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
     const range = url.searchParams.get('range') || '7'; // 기본값 7일
 
     // 1. 사용자 확인
-    const cookieHeader = request.headers.get('Cookie');
-    if (!cookieHeader) {
+    const user = await getSession(request, env);
+    if (!user) {
         return new Response('Unauthorized', { status: 401 });
     }
-
-    const cookies = Object.fromEntries(
-        (cookieHeader || '').split(';').map((c) => c.trim().split('='))
-    );
-    const token = cookies['auth_token'];
-    if (!token) {
-        return new Response('Unauthorized', { status: 401 });
-    }
-
-    let userId: string;
-    try {
-        const secret = new TextEncoder().encode(env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        userId = payload.sub as string;
-    } catch {
-        return new Response('Invalid Token', { status: 401 });
-    }
+    const userId = user.sub;
 
     try {
         // 2. D1 데이터베이스에서 통계 정보 조회 (KST 기준)

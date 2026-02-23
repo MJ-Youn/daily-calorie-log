@@ -1,11 +1,12 @@
 import { jwtVerify } from 'jose';
 
-interface Env {
+export interface Env {
     JWT_SECRET: string;
-    DB: unknown;
+    DB: any;
+    [key: string]: any;
 }
 
-interface UserPayload {
+export interface UserPayload {
     sub: string;
     email: string;
     name: string;

@@ -1,15 +1,4 @@
-import { jwtVerify } from 'jose';
-
-interface Env {
-    JWT_SECRET: string;
-    DB: {
-        prepare: (s: string) => {
-            bind: (...values: (string | number | undefined | null)[]) => {
-                all: () => Promise<{ results: Record<string, unknown>[] }>;
-            };
-        };
-    };
-}
+import { getSession, Env } from '../auth/me';
 
 /**
  * 특정 날짜의 활동 로그 목록을 조회하는 API 엔드포인트입니다.
@@ -25,25 +14,11 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
     const date = url.searchParams.get('date'); // YYYY-MM-DD
 
     // 1. Verify User
-    const cookieHeader = request.headers.get('Cookie');
-    if (!cookieHeader) return new Response('Unauthorized', { status: 401 });
-
-    const cookies = Object.fromEntries(
-        cookieHeader.split(';').map((c) => c.trim().split('='))
-    );
-    const token = cookies['auth_token'];
-    if (!token) {
+    const user = await getSession(request, env);
+    if (!user) {
         return new Response('Unauthorized', { status: 401 });
     }
-
-    let userId: string | number;
-    try {
-        const secret = new TextEncoder().encode(env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        userId = payload.sub as string;
-    } catch {
-        return new Response('Invalid Token', { status: 401 });
-    }
+    const userId = user.sub;
 
     try {
         let query = 'SELECT * FROM activity_logs WHERE user_id = ?';

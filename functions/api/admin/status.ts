@@ -1,9 +1,4 @@
-interface Env {
-    GOOGLE_CLIENT_ID: string;
-    GOOGLE_CLIENT_SECRET: string;
-    GEMINI_API_KEY: string;
-    DB: any;
-}
+import { getSession, Env } from '../auth/me';
 
 /**
  * 프로젝트 내 주요 서비스들의 상태를 점검하고 외부 링크를 제공하는 API 엔드포인트입니다.
@@ -14,8 +9,17 @@ interface Env {
  * @param {any} context Cloudflare Worker context
  * @returns {Promise<Response>} 서비스 상태 정보 JSON
  */
-export const onRequestGet = async (context: { env: Env }): Promise<Response> => {
-    const { env } = context;
+export const onRequestGet = async (context: { request: Request; env: Env }): Promise<Response> => {
+    const { request, env } = context;
+
+    // 1. 관리자 권한 확인
+    const user = await getSession(request, env);
+    if (!user) {
+        return new Response('Unauthorized', { status: 401 });
+    }
+    if (user.role !== 'ADMIN') {
+        return new Response('Forbidden: Admin access required', { status: 403 });
+    }
 
     const status = {
         google: { status: 'UNKNOWN', message: '' },
