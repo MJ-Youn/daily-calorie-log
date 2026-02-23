@@ -1,7 +1,4 @@
-interface Env {
-    GEMINI_API_KEY: string;
-    JWT_SECRET: string;
-}
+import { getSession, Env } from './auth/me';
 
 /**
  * AI를 사용하여 사용자의 텍스트 입력을 분석하는 API 엔드포인트입니다.
@@ -16,8 +13,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
     const { request, env } = context;
 
     // 1. 사용자 세션 체크 (보안 강화)
-    const cookieHeader = request.headers.get('Cookie');
-    if (!cookieHeader || !cookieHeader.includes('auth_token=')) {
+    const user = await getSession(request, env);
+    if (!user) {
         return new Response('Unauthorized', { status: 401 });
     }
 
