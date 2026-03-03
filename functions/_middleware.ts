@@ -1,5 +1,7 @@
+import { jwtVerify } from 'jose';
+
 interface Env {
-    // Defines bindings
+    JWT_SECRET: string;
 }
 
 /**
@@ -9,7 +11,7 @@ interface Env {
  * @since 2026-01-30
  */
 export const onRequest = async (context: { request: Request; next: () => Promise<Response>; env: Env }) => {
-    const { request, next } = context;
+    const { request, next, env } = context;
     const url = new URL(request.url);
 
     // 제외할 경로 목록
@@ -32,8 +34,26 @@ export const onRequest = async (context: { request: Request; next: () => Promise
     }
 
     // 쿠키 확인
-    const cookies = request.headers.get('Cookie') || '';
-    if (!cookies.includes('human_verified=true')) {
+    const cookieHeader = request.headers.get('Cookie') || '';
+    const cookies = Object.fromEntries(
+        cookieHeader.split(';').map((c) => c.trim().split('='))
+    );
+    const verificationToken = cookies['human_verified'];
+
+    let isVerified = false;
+    if (verificationToken) {
+        try {
+            const secret = new TextEncoder().encode(env.JWT_SECRET);
+            const { payload } = await jwtVerify(verificationToken, secret);
+            if (payload && payload.human_verified === true) {
+                isVerified = true;
+            }
+        } catch (e) {
+            console.error('Human verification token invalid:', e);
+        }
+    }
+
+    if (!isVerified) {
         // API 요청인 경우 JSON 에러 반환 (리다이렉트 방지)
         if (url.pathname.startsWith('/api/')) {
             return new Response(

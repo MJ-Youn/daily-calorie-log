@@ -1,5 +1,8 @@
+import { SignJWT } from 'jose';
+
 interface Env {
     TURNSTILE_SECRET_KEY: string;
+    JWT_SECRET: string;
 }
 
 interface TurnstileVerifyResponse {
@@ -50,11 +53,18 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
         }
 
         // Verification successful
-        // Set a cookie valid for 1 hour (or as desired)
-        // Note: For better security, sign this cookie or combine with session
-        // Here we use a simple flag. In production, use Hmac or ensure domain restriction.
+        // Generate a signed JWT for human verification
+        const secret = new TextEncoder().encode(env.JWT_SECRET);
+        const verificationToken = await new SignJWT({ human_verified: true })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('1h')
+            .sign(secret);
+
+        // Set a cookie valid for 1 hour
+        const isProd = new URL(request.url).hostname !== 'localhost';
         const headers = new Headers();
-        headers.append('Set-Cookie', `human_verified=true; Path=/; Max-Age=3600; Secure; SameSite=Lax; HttpOnly`);
+        headers.append('Set-Cookie', `human_verified=${verificationToken}; Path=/; Max-Age=3600; ${isProd ? 'Secure; ' : ''}SameSite=Lax; HttpOnly`);
         headers.append('Content-Type', 'application/json');
 
         return new Response(JSON.stringify({ success: true }), {
