@@ -322,10 +322,19 @@ export const DashboardPage: React.FC = () => {
         setAnalyzedData({ items: newItems });
     };
 
-    const totalFoodCalories = logs.filter((l) => l.type === 'FOOD').reduce((sum, log) => sum + log.calories, 0);
-    const totalExerciseCalories = logs.filter((l) => l.type !== 'FOOD').reduce((sum, log) => sum + Math.abs(log.calories), 0);
+    const { totalFoodCalories, totalExerciseCalories, totalProtein } = logs.reduce(
+        (acc, log) => {
+            if (log.type === 'FOOD') {
+                acc.totalFoodCalories += log.calories;
+            } else {
+                acc.totalExerciseCalories += Math.abs(log.calories);
+            }
+            acc.totalProtein += log.protein || 0;
+            return acc;
+        },
+        { totalFoodCalories: 0, totalExerciseCalories: 0, totalProtein: 0 },
+    );
     const totalNetCalories = totalFoodCalories - totalExerciseCalories;
-    const totalProtein = logs.reduce((sum, log) => sum + (log.protein || 0), 0);
 
     // Group logs by category for display
     const groupedLogs = React.useMemo(() => {
