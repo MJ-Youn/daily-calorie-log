@@ -5,12 +5,38 @@ import { Card } from './ui';
 import { Users, FileText, Activity, ExternalLink, Search as SearchIcon } from 'lucide-react';
 import { APP_VERSION } from '../constants';
 
+interface AdminLog {
+    id: number;
+    user_id: number;
+    type: 'FOOD' | 'EXERCISE';
+    content: string;
+    calories: number;
+    protein: number;
+    recorded_date: string;
+    created_at: string;
+    email: string;
+    name: string;
+}
+
 interface AdminStats {
     totalUsers: number;
     totalLogs: number;
     filteredTotal: number;
-    recentLogs: any[];
+    recentLogs: AdminLog[];
     totalPages: number;
+}
+
+interface SystemServiceStatus {
+    status: string;
+    message: string;
+}
+
+interface SystemStatusResponse {
+    google: SystemServiceStatus;
+    gemini: SystemServiceStatus;
+    cloudflare: SystemServiceStatus;
+    d1: SystemServiceStatus;
+    timestamp: string;
 }
 
 /**
@@ -163,7 +189,7 @@ export const AdminDashboard: React.FC = () => {
                             {stats.recentLogs?.length === 0 ? (
                                 <div className="p-4 text-center text-gray-400">No logs found.</div>
                             ) : (
-                                stats.recentLogs?.map((log: any) => (
+                                stats.recentLogs?.map((log) => (
                                     <div
                                         key={log.id}
                                         className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors grid grid-cols-4 items-center"
@@ -249,7 +275,7 @@ export const AdminDashboard: React.FC = () => {
  * @since 2026-01-28
  */
 const SystemStatus: React.FC = () => {
-    const [status, setStatus] = useState<any>(null);
+    const [status, setStatus] = useState<SystemStatusResponse | null>(null);
 
     useEffect(() => {
         fetch('/api/admin/status')
