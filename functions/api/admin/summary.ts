@@ -24,9 +24,17 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
     try {
         // Parse Query Params
         const url = new URL(request.url);
-        const page = parseInt(url.searchParams.get('page') || '1');
-        const limit = parseInt(url.searchParams.get('limit') || '10');
+
+        // Pagination Limit & Validation
+        const MAX_LIMIT = 100;
+        let page = parseInt(url.searchParams.get('page') || '1');
+        let limit = parseInt(url.searchParams.get('limit') || '10');
         const search = url.searchParams.get('search') || '';
+
+        // Validate Input
+        if (isNaN(page) || page < 1) page = 1;
+        if (isNaN(limit) || limit < 1) limit = 10;
+        if (limit > MAX_LIMIT) limit = MAX_LIMIT;
 
         const offset = (page - 1) * limit;
 
