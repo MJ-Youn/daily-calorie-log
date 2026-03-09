@@ -116,8 +116,9 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
 
     try {
         // 4. Prepare Batch Insert
+        const insertStmt = env.DB.prepare('INSERT INTO activity_logs (user_id, type, content, calories, protein, recorded_date, category) VALUES (?, ?, ?, ?, ?, ?, ?)');
         const statements = items.map((item) => {
-            return env.DB.prepare('INSERT INTO activity_logs (user_id, type, content, calories, protein, recorded_date, category) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(
+            return insertStmt.bind(
                 userId,
                 item.type,
                 item.content || item.name,
